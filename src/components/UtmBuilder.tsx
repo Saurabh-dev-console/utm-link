@@ -3,9 +3,12 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
-import { Copy, Check, Info, Link as LinkIcon } from "lucide-react";
+import { Copy, Check, Info, LinkIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { toast } from "sonner";
+import Header from "./Header";
+import Footer from "./Footer";
+import HeroSection from "./HeroSection";
 
 interface UtmParams {
   baseUrl: string;
@@ -62,31 +65,6 @@ const UtmBuilder = () => {
       .trim()
       .replace(/\s+/g, "-")
       .replace(/[^\w-]/g, "");
-  };
-
-  const validateFields = (): boolean => {
-    const newErrors: Partial<Record<keyof UtmParams, string>> = {};
-
-    if (!params.baseUrl) {
-      newErrors.baseUrl = "Base URL is required";
-    } else if (!validateUrl(params.baseUrl)) {
-      newErrors.baseUrl = "Please enter a valid URL (http:// or https://)";
-    }
-
-    if (!params.utm_source) {
-      newErrors.utm_source = "Source is required";
-    }
-
-    if (!params.utm_medium) {
-      newErrors.utm_medium = "Medium is required";
-    }
-
-    if (!params.utm_campaign) {
-      newErrors.utm_campaign = "Campaign is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   const generateUrl = () => {
@@ -151,311 +129,396 @@ const UtmBuilder = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-4">
-            <LinkIcon className="w-10 h-10 text-primary mr-3" />
-            <h1 className="text-4xl font-bold text-foreground">UTM Link Builder</h1>
-          </div>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Create properly formatted UTM-tagged URLs for your marketing campaigns. Track your traffic sources with Google Analytics.
-          </p>
-        </div>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Header />
+      
+      <main className="flex-1">
+        <HeroSection />
+        
+        {/* Main Builder Section */}
+        <section id="builder" className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
+          <div className="max-w-7xl mx-auto">
+            {/* Section Header */}
+            <div className="text-center mb-12 animate-fade-in">
+              <h2 className="text-3xl font-bold text-foreground mb-3">
+                Build Your UTM Link
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Fill in the campaign details below to generate your tracking URL
+              </p>
+            </div>
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Input Form */}
-          <Card className="p-6 shadow-lg">
-            <h2 className="text-2xl font-semibold mb-6 text-foreground">Campaign Details</h2>
+            {/* Main Content */}
+            <div className="grid lg:grid-cols-2 gap-8 animate-slide-up">
+              {/* Input Form */}
+              <Card className="p-6 shadow-xl border-border/50 hover:shadow-2xl transition-shadow duration-300 bg-card/80 backdrop-blur">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-gradient-primary rounded-lg">
+                    <LinkIcon className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground">Campaign Details</h3>
+                </div>
             
-            <TooltipProvider>
-              <div className="space-y-5">
-                {/* Base URL */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Label htmlFor="baseUrl" className="text-sm font-medium">
-                      Base URL <span className="text-destructive">*</span>
-                    </Label>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        <p>{tooltips.baseUrl}</p>
-                      </TooltipContent>
-                    </Tooltip>
+                <TooltipProvider>
+                  <div className="space-y-5">
+                    {/* Base URL */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Label htmlFor="baseUrl" className="text-sm font-medium">
+                          Base URL <span className="text-destructive">*</span>
+                        </Label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p>{tooltips.baseUrl}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Input
+                        id="baseUrl"
+                        placeholder="https://example.com/page"
+                        value={params.baseUrl}
+                        onChange={(e) => handleInputChange("baseUrl", e.target.value)}
+                        className={errors.baseUrl ? "border-destructive" : ""}
+                      />
+                      {errors.baseUrl && (
+                        <p className="text-xs text-destructive mt-1">{errors.baseUrl}</p>
+                      )}
+                    </div>
+
+                    {/* UTM Source */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Label htmlFor="utm_source" className="text-sm font-medium">
+                          Campaign Source <span className="text-destructive">*</span>
+                        </Label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p>{tooltips.utm_source}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Input
+                        id="utm_source"
+                        placeholder="google, facebook, newsletter"
+                        value={params.utm_source}
+                        onChange={(e) => handleInputChange("utm_source", e.target.value)}
+                        className={errors.utm_source ? "border-destructive" : ""}
+                      />
+                      {errors.utm_source && (
+                        <p className="text-xs text-destructive mt-1">{errors.utm_source}</p>
+                      )}
+                    </div>
+
+                    {/* UTM Medium */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Label htmlFor="utm_medium" className="text-sm font-medium">
+                          Campaign Medium <span className="text-destructive">*</span>
+                        </Label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p>{tooltips.utm_medium}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Input
+                        id="utm_medium"
+                        placeholder="cpc, email, social"
+                        value={params.utm_medium}
+                        onChange={(e) => handleInputChange("utm_medium", e.target.value)}
+                        className={errors.utm_medium ? "border-destructive" : ""}
+                      />
+                      {errors.utm_medium && (
+                        <p className="text-xs text-destructive mt-1">{errors.utm_medium}</p>
+                      )}
+                    </div>
+
+                    {/* UTM Campaign */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Label htmlFor="utm_campaign" className="text-sm font-medium">
+                          Campaign Name <span className="text-destructive">*</span>
+                        </Label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p>{tooltips.utm_campaign}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Input
+                        id="utm_campaign"
+                        placeholder="spring_sale, product_launch"
+                        value={params.utm_campaign}
+                        onChange={(e) => handleInputChange("utm_campaign", e.target.value)}
+                        className={errors.utm_campaign ? "border-destructive" : ""}
+                      />
+                      {errors.utm_campaign && (
+                        <p className="text-xs text-destructive mt-1">{errors.utm_campaign}</p>
+                      )}
+                    </div>
+
+                    {/* Optional Parameters */}
+                    <div className="pt-4 border-t">
+                      <h3 className="text-sm font-semibold mb-4 text-muted-foreground">
+                        Optional Parameters
+                      </h3>
+
+                      <div className="space-y-4">
+                        {/* UTM ID */}
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Label htmlFor="utm_id" className="text-sm font-medium">
+                              Campaign ID
+                            </Label>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>{tooltips.utm_id}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <Input
+                            id="utm_id"
+                            placeholder="campaign_123"
+                            value={params.utm_id}
+                            onChange={(e) => handleInputChange("utm_id", e.target.value)}
+                          />
+                        </div>
+
+                        {/* UTM Term */}
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Label htmlFor="utm_term" className="text-sm font-medium">
+                              Campaign Term
+                            </Label>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>{tooltips.utm_term}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <Input
+                            id="utm_term"
+                            placeholder="running_shoes"
+                            value={params.utm_term}
+                            onChange={(e) => handleInputChange("utm_term", e.target.value)}
+                          />
+                        </div>
+
+                        {/* UTM Content */}
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Label htmlFor="utm_content" className="text-sm font-medium">
+                              Campaign Content
+                            </Label>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>{tooltips.utm_content}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <Input
+                            id="utm_content"
+                            placeholder="header_link, sidebar_cta"
+                            value={params.utm_content}
+                            onChange={(e) => handleInputChange("utm_content", e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <Input
-                    id="baseUrl"
-                    placeholder="https://example.com/page"
-                    value={params.baseUrl}
-                    onChange={(e) => handleInputChange("baseUrl", e.target.value)}
-                    className={errors.baseUrl ? "border-destructive" : ""}
-                  />
-                  {errors.baseUrl && (
-                    <p className="text-xs text-destructive mt-1">{errors.baseUrl}</p>
-                  )}
-                </div>
+                </TooltipProvider>
+              </Card>
 
-                {/* UTM Source */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Label htmlFor="utm_source" className="text-sm font-medium">
-                      Campaign Source <span className="text-destructive">*</span>
-                    </Label>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        <p>{tooltips.utm_source}</p>
-                      </TooltipContent>
-                    </Tooltip>
+              {/* Preview Card */}
+              <Card className="p-6 shadow-xl border-border/50 hover:shadow-2xl transition-shadow duration-300 bg-card/80 backdrop-blur">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="p-2 bg-gradient-primary rounded-lg">
+                    <Copy className="w-5 h-5 text-white" />
                   </div>
-                  <Input
-                    id="utm_source"
-                    placeholder="google, facebook, newsletter"
-                    value={params.utm_source}
-                    onChange={(e) => handleInputChange("utm_source", e.target.value)}
-                    className={errors.utm_source ? "border-destructive" : ""}
-                  />
-                  {errors.utm_source && (
-                    <p className="text-xs text-destructive mt-1">{errors.utm_source}</p>
-                  )}
+                  <h3 className="text-xl font-semibold text-foreground">Generated URL</h3>
                 </div>
-
-                {/* UTM Medium */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Label htmlFor="utm_medium" className="text-sm font-medium">
-                      Campaign Medium <span className="text-destructive">*</span>
-                    </Label>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        <p>{tooltips.utm_medium}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                  <Input
-                    id="utm_medium"
-                    placeholder="cpc, email, social"
-                    value={params.utm_medium}
-                    onChange={(e) => handleInputChange("utm_medium", e.target.value)}
-                    className={errors.utm_medium ? "border-destructive" : ""}
-                  />
-                  {errors.utm_medium && (
-                    <p className="text-xs text-destructive mt-1">{errors.utm_medium}</p>
-                  )}
-                </div>
-
-                {/* UTM Campaign */}
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Label htmlFor="utm_campaign" className="text-sm font-medium">
-                      Campaign Name <span className="text-destructive">*</span>
-                    </Label>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-xs">
-                        <p>{tooltips.utm_campaign}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                  <Input
-                    id="utm_campaign"
-                    placeholder="spring_sale, product_launch"
-                    value={params.utm_campaign}
-                    onChange={(e) => handleInputChange("utm_campaign", e.target.value)}
-                    className={errors.utm_campaign ? "border-destructive" : ""}
-                  />
-                  {errors.utm_campaign && (
-                    <p className="text-xs text-destructive mt-1">{errors.utm_campaign}</p>
-                  )}
-                </div>
-
-                {/* Optional Parameters */}
-                <div className="pt-4 border-t">
-                  <h3 className="text-sm font-semibold mb-4 text-muted-foreground">
-                    Optional Parameters
-                  </h3>
-
+            
+                {generatedUrl ? (
                   <div className="space-y-4">
-                    {/* UTM ID */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Label htmlFor="utm_id" className="text-sm font-medium">
-                          Campaign ID
-                        </Label>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs">
-                            <p>{tooltips.utm_id}</p>
-                          </TooltipContent>
-                        </Tooltip>
+                    <div className="bg-gradient-secondary/10 p-4 rounded-lg border border-primary/20">
+                      <p className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
+                        <Check className="w-4 h-4 text-success" />
+                        Your tagged URL:
+                      </p>
+                      <div className="break-all text-sm font-mono text-foreground bg-background p-3 rounded border border-border/50 shadow-inner">
+                        {generatedUrl}
                       </div>
-                      <Input
-                        id="utm_id"
-                        placeholder="campaign_123"
-                        value={params.utm_id}
-                        onChange={(e) => handleInputChange("utm_id", e.target.value)}
-                      />
                     </div>
 
-                    {/* UTM Term */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Label htmlFor="utm_term" className="text-sm font-medium">
-                          Campaign Term
-                        </Label>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs">
-                            <p>{tooltips.utm_term}</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                      <Input
-                        id="utm_term"
-                        placeholder="running_shoes"
-                        value={params.utm_term}
-                        onChange={(e) => handleInputChange("utm_term", e.target.value)}
-                      />
-                    </div>
+                    <Button
+                      onClick={handleCopy}
+                      className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300"
+                      size="lg"
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-5 h-5 mr-2" />
+                          Copied to Clipboard!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-5 h-5 mr-2" />
+                          Copy URL to Clipboard
+                        </>
+                      )}
+                    </Button>
 
-                    {/* UTM Content */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Label htmlFor="utm_content" className="text-sm font-medium">
-                          Campaign Content
-                        </Label>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="w-4 h-4 text-muted-foreground cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs">
-                            <p>{tooltips.utm_content}</p>
-                          </TooltipContent>
-                        </Tooltip>
+                    {/* URL Breakdown */}
+                    <div className="pt-4 border-t">
+                      <h3 className="text-sm font-semibold mb-3 text-muted-foreground">URL Breakdown</h3>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Base URL:</span>
+                          <span className="font-medium text-foreground">{params.baseUrl}</span>
+                        </div>
+                        {params.utm_source && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Source:</span>
+                            <span className="font-medium text-foreground">{normalizeValue(params.utm_source)}</span>
+                          </div>
+                        )}
+                        {params.utm_medium && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Medium:</span>
+                            <span className="font-medium text-foreground">{normalizeValue(params.utm_medium)}</span>
+                          </div>
+                        )}
+                        {params.utm_campaign && (
+                          <div className="flex justify-between">
+                            <span className="text-muted-foreground">Campaign:</span>
+                            <span className="font-medium text-foreground">{normalizeValue(params.utm_campaign)}</span>
+                          </div>
+                        )}
                       </div>
-                      <Input
-                        id="utm_content"
-                        placeholder="header_link, sidebar_cta"
-                        value={params.utm_content}
-                        onChange={(e) => handleInputChange("utm_content", e.target.value)}
-                      />
                     </div>
                   </div>
-                </div>
-              </div>
-            </TooltipProvider>
-          </Card>
-
-          {/* Preview Card */}
-          <Card className="p-6 shadow-lg">
-            <h2 className="text-2xl font-semibold mb-6 text-foreground">Generated URL</h2>
-            
-            {generatedUrl ? (
-              <div className="space-y-4">
-                <div className="bg-secondary p-4 rounded-lg border border-border">
-                  <p className="text-sm text-muted-foreground mb-2">Your tagged URL:</p>
-                  <div className="break-all text-sm font-mono text-foreground bg-background p-3 rounded border border-border">
-                    {generatedUrl}
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <LinkIcon className="w-16 h-16 text-muted-foreground/30 mb-4" />
+                    <p className="text-muted-foreground mb-2">Fill in the required fields to generate your URL</p>
+                    <p className="text-sm text-muted-foreground">
+                      Fields marked with <span className="text-destructive">*</span> are required
+                    </p>
                   </div>
-                </div>
-
-                <Button
-                  onClick={handleCopy}
-                  className="w-full"
-                  size="lg"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 mr-2" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 mr-2" />
-                      Copy to Clipboard
-                    </>
-                  )}
-                </Button>
-
-                {/* URL Breakdown */}
-                <div className="pt-4 border-t">
-                  <h3 className="text-sm font-semibold mb-3 text-muted-foreground">URL Breakdown</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Base URL:</span>
-                      <span className="font-medium text-foreground">{params.baseUrl}</span>
-                    </div>
-                    {params.utm_source && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Source:</span>
-                        <span className="font-medium text-foreground">{normalizeValue(params.utm_source)}</span>
-                      </div>
-                    )}
-                    {params.utm_medium && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Medium:</span>
-                        <span className="font-medium text-foreground">{normalizeValue(params.utm_medium)}</span>
-                      </div>
-                    )}
-                    {params.utm_campaign && (
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Campaign:</span>
-                        <span className="font-medium text-foreground">{normalizeValue(params.utm_campaign)}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <LinkIcon className="w-16 h-16 text-muted-foreground/30 mb-4" />
-                <p className="text-muted-foreground mb-2">Fill in the required fields to generate your URL</p>
-                <p className="text-sm text-muted-foreground">
-                  Fields marked with <span className="text-destructive">*</span> are required
-                </p>
-              </div>
-            )}
-          </Card>
-        </div>
+                )}
+              </Card>
+            </div>
+          </div>
+        </section>
 
         {/* Help Section */}
-        <Card className="mt-8 p-6 bg-card/50">
-          <h2 className="text-xl font-semibold mb-4 text-foreground">What are UTM Parameters?</h2>
-          <div className="grid md:grid-cols-2 gap-4 text-sm">
-            <div>
-              <h3 className="font-semibold text-primary mb-2">utm_source</h3>
-              <p className="text-muted-foreground">Identifies where your traffic is coming from (e.g., google, newsletter, facebook).</p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-primary mb-2">utm_medium</h3>
-              <p className="text-muted-foreground">The marketing medium (e.g., cpc for paid ads, email, social media).</p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-primary mb-2">utm_campaign</h3>
-              <p className="text-muted-foreground">The specific campaign name (e.g., spring_sale, product_launch_2025).</p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-primary mb-2">utm_content</h3>
-              <p className="text-muted-foreground">Differentiates similar content or links within the same ad (A/B testing).</p>
-            </div>
+        <section id="guide" className="py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <Card className="p-8 bg-gradient-to-br from-card/50 to-primary/5 border-primary/20 shadow-xl animate-fade-in">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-foreground mb-3">
+                  Understanding UTM Parameters
+                </h2>
+                <p className="text-muted-foreground">
+                  Learn how each parameter helps track your marketing campaigns
+                </p>
+              </div>
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="p-6 bg-card rounded-lg border border-border shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <span className="text-xl">🎯</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-primary mb-2">utm_source</h3>
+                      <p className="text-sm text-muted-foreground">Identifies where your traffic is coming from (e.g., google, newsletter, facebook).</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 bg-card rounded-lg border border-border shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-accent/10 rounded-lg">
+                      <span className="text-xl">📱</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-accent mb-2">utm_medium</h3>
+                      <p className="text-sm text-muted-foreground">The marketing medium (e.g., cpc for paid ads, email, social media).</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 bg-card rounded-lg border border-border shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-success/10 rounded-lg">
+                      <span className="text-xl">🚀</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-success mb-2">utm_campaign</h3>
+                      <p className="text-sm text-muted-foreground">The specific campaign name (e.g., spring_sale, product_launch_2025).</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 bg-card rounded-lg border border-border shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <span className="text-xl">🔍</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-primary mb-2">utm_term</h3>
+                      <p className="text-sm text-muted-foreground">For paid search campaigns, track specific keywords that triggered your ads.</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 bg-card rounded-lg border border-border shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-accent/10 rounded-lg">
+                      <span className="text-xl">✨</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-accent mb-2">utm_content</h3>
+                      <p className="text-sm text-muted-foreground">Differentiates similar content or links within the same ad (A/B testing).</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="p-6 bg-card rounded-lg border border-border shadow-sm hover:shadow-lg hover:border-primary/30 transition-all duration-300">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-success/10 rounded-lg">
+                      <span className="text-xl">🆔</span>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-success mb-2">utm_id</h3>
+                      <p className="text-sm text-muted-foreground">Campaign ID for advanced tracking in analytics platforms and CRM systems.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
           </div>
-        </Card>
-      </div>
+        </section>
+      </main>
+
+      <Footer />
     </div>
   );
 };
